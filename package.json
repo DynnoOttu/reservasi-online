@@ -9,6 +9,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@dotlottie/react-player": "^1.6.15",
+    "@lottiefiles/react-lottie-player": "^3.5.3",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/native": "^6.1.7",
@@ -17,11 +19,14 @@
     "expo": "~49.0.7",
     "expo-status-bar": "~1.6.0",
     "jwt-decode": "^3.1.2",
+    "lottie-ios": "^4.4.0",
+    "lottie-react-native": "^6.6.0",
     "react": "18.2.0",
     "react-native": "0.72.3",
     "react-native-date-picker": "^4.3.5",
     "react-native-safe-area-context": "4.6.3",
-    "react-native-screens": "~3.22.0"
+    "react-native-screens": "~3.22.0",
+    "react-native-toast-message": "^2.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

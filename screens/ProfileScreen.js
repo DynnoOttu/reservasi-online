@@ -1,14 +1,20 @@
-import { StyleSheet, Text, View, Image, Pressable } from "react-native";
+import { StyleSheet, Text, View, Image, Pressable, TextInput, Button } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 const ProfileScreen = () => {
   const [user, setUser] = useState("");
   const navigation = useNavigation();
   const { userId, setUserId } = useContext(UserType);
+
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -22,8 +28,49 @@ const ProfileScreen = () => {
       }
     };
 
+
+
     fetchProfile();
-  });
+
+  }, []);
+
+  const showToast = () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Update Success',
+      text2: 'Anda telah berhasil melakukan update profile'
+    });
+  }
+
+ 
+  const handleUpdateProfile = async () => {
+    try {
+      const update = await axios.put(`http://10.10.172.27:3000/profile/${userId}`, {
+        name,
+        email,
+      });
+
+      if (update.status === 200) {
+        console.log('Profile updated successfully', update.data);
+        showToast()
+
+        setTimeout(() => {
+          logout()
+        }, 2000);
+          
+        // Redirect atau lakukan tindakan lain setelah pembaruan berhasil
+      } else {
+        console.error('Failed to update profile', update.data);
+        // Handle kesalahan atau beri tahu pengguna
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('Error updating profile', error.response.status, error.response.data);
+      } else {
+        console.error('Error updating profile', error.message);
+      }
+    }
+  };
 
   const logout = () => {
     clearAuthToken();
@@ -115,6 +162,27 @@ const ProfileScreen = () => {
           </Pressable>
         </View>
       </View>
+
+      <View style={{ marginTop: 60 }}>
+        <View style={{ borderWidth: 1, borderColor: 'green' }}>
+        <TextInput
+        placeholder="Name"
+        value={name}
+        onChangeText={(text) => setName(text)}
+        style={{ padding: 10 }}
+      />
+        </View>
+
+        <View style={{ borderWidth: 1, borderColor: 'green', marginTop: 10, marginBottom: 30 }}>
+        <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+        style={{ padding: 10 }}
+      />
+        </View>
+      <Button title="Update Profile" onPress={handleUpdateProfile} style={{ padding: 20 }}/>
+    </View>
     </View>
   );
 };

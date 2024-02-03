@@ -31,7 +31,8 @@ app.listen(port, () => {
 
 const User = require("./models/user");
 const Dokter = require("./models/dokter");
-// const Post = require("./models/post");
+const Reservation = require("./models/Reservation");
+const Pemeriksaan = require("./models/pemeriksaan");
 
 //endpoint to register a user in the backend
 app.post("/register", async (req, res) => {
@@ -305,5 +306,187 @@ app.get("/get-dokter", async (req, res) => {
     res
       .status(500)
       .json({ message: "An error occurred while getting the posts" });
+  }
+});
+
+app.patch('/update-dokter/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const updatedDokter = await Dokter.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true }
+    );
+
+    if (!updatedDokter) {
+      return res.status(404).json({ message: 'Dokter not found' });
+    }
+
+    res.status(200).json(updatedDokter);
+  } catch (error) {
+    res.status(500).json({ message: 'An error occurred while updating the Dokter' });
+  }
+});
+
+
+app.post("/create-pemeriksaan", async (req, res) => {
+  try {
+    const { userId, dokterId, tanggal, jam, keterangan, status } = req.body;
+
+    const newPostData = {
+      user: userId,
+      dokter: dokterId,
+      tanggal,
+      jam,
+      keterangan,
+      status
+    };
+    const newPost = new Pemeriksaan(newPostData);
+
+    await newPost.save();
+
+    res.status(200).json({ message: "Post saved successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "post creation failed" });
+    console.log("Pemeriksaan", error)
+  }
+});
+
+app.get('/get-pemeriksaan/:userId', async (req, res) => {
+  
+  try {
+    const userId = req.params.userId;
+
+    const posts = await Pemeriksaan.find({ user: userId })
+    .populate({
+      path: 'user',
+      select: 'name',
+    })
+      .populate({
+        path: 'dokter',
+        select: '-__v', // Menampilkan semua field kecuali __v
+      })
+
+    res.status(200).json(posts);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "An error occurred while getting the posts" });
+  }
+});
+
+
+// Reservation
+app.post("/create-reservation", async (req, res) => {
+  try {
+    const { userId, dokterId, tanggal, jam, keterangan, status } = req.body;
+
+    const newPostData = {
+      user: userId,
+      dokter: dokterId,
+      tanggal,
+      jam,
+      keterangan,
+      status
+    };
+    const newPost = new Reservation(newPostData);
+
+    await newPost.save();
+
+    res.status(200).json({ message: "Reservation saved successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Reservation creation failed" });
+    console.log("Reservation", error)
+  }
+});
+
+app.get('/get-reservation/:userId', async (req, res) => {
+  
+  try {
+    const userId = req.params.userId;
+
+    const posts = await Reservation.find({ user: userId })
+    .populate({
+      path: 'user',
+      select: 'name',
+    })
+      .populate({
+        path: 'dokter',
+        select: '-__v', // Menampilkan semua field kecuali __v
+      })
+
+    res.status(200).json(posts);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "An error occurred while getting the posts" });
+  }
+});
+
+
+
+app.put("/profile/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { name, email, password, profilePicture } = req.body;
+
+    // Pastikan minimal satu field yang akan diupdate ada dalam request
+    if (!name && !email && !password && !profilePicture) {
+      return res.status(400).json({ message: "At least one field is required for update" });
+    }
+
+    // Cek apakah user dengan userId ada
+    const existingUser = await User.findById(userId);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update field yang diberikan dalam request
+    if (name) existingUser.name = name;
+    if (email) existingUser.email = email;
+    if (password) existingUser.password = password;
+    if (profilePicture) existingUser.profilePicture = profilePicture;
+
+    // Simpan perubahan
+    await existingUser.save();
+
+    return res.status(200).json({ message: "Profile updated successfully", user: existingUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error while updating the profile" });
+  }
+});
+
+app.put("/profile/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { name, email, password } = req.body;
+
+    // Pastikan minimal satu field yang akan diupdate ada dalam request
+    if (!name && !email && !password) {
+      return res.status(400).json({ message: "At least one field is required for update" });
+    }
+
+    // Cek apakah user dengan userId ada
+    const existingUser = await User.findById(userId);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update field yang diberikan dalam request
+    if (name) existingUser.name = name;
+    if (email) existingUser.email = email;
+    if (password) existingUser.password = password;
+
+    // Simpan perubahan
+    await existingUser.save();
+
+    return res.status(200).json({ message: "Profile updated successfully", user: existingUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error while updating the profile" });
   }
 });

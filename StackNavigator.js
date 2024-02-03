@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ActivityScreen from "./screens/ActivityScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import Reservasi from "./screens/Reservasi";
+import JadwalDokter from "./screens/JadwalDokter";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -106,6 +107,10 @@ const StackNavigator = () => {
         <Stack.Screen
           name="Reservasi"
           component={Reservasi}
+        />
+        <Stack.Screen
+          name="JadwalDokter"
+          component={JadwalDokter}
         />
       </Stack.Navigator>
     </NavigationContainer>

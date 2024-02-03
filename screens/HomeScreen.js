@@ -59,6 +59,7 @@ const HomeScreen = ({navigation}) => {
               gap: 10,
               marginVertical: 10,
             }}
+            key={post._id}
           >
             <View>
               <Image

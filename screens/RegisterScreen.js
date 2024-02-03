@@ -29,7 +29,7 @@ const RegisterScreen = () => {
     };
 
     axios
-      .post("http://192.168.43.14:3000/register/", user)
+      .post("http://10.10.172.27:3000/register/", user)
       .then((response) => {
         console.log(response);
         Alert.alert(
